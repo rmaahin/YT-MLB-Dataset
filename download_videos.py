@@ -14,7 +14,7 @@ with open('data/mlb-youtube-segmented.json', 'r') as f:
     data = json.load(f)
 
 # Loop through video entries
-for video_id, entry in tqdm(data.items()):
+for video_id, entry in tqdm(data.items(), desc="Downloading videos"):
     yturl = entry['url']
     ytid = yturl.split('=')[-1]
     start_time = entry['start']
@@ -23,7 +23,7 @@ for video_id, entry in tqdm(data.items()):
 
     # Skip if video segment already exists
     if os.path.exists(output_path):
-        print(f"Skipping {ytid}, already downloaded.")
+        tqdm.write(f"Skipping {ytid}, already downloaded.")
         continue
 
     # Download specific section using yt-dlp
@@ -36,11 +36,13 @@ for video_id, entry in tqdm(data.items()):
         yturl
     ]
 
-    print(f"Downloading {yturl} from {start_time} to {end_time} ...")
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    tqdm.write(f"Downloading {yturl} from {start_time} to {end_time} ...")
+    
+    # Run command without capturing output to avoid mixing with tqdm
+    result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
 
     # Print errors if download fails
     if result.returncode != 0:
-        print(f"Error downloading {ytid}: {result.stderr}")
+        tqdm.write(f"Error downloading {ytid}: {result.stderr}")
     else:
-        print(f"Downloaded {ytid} successfully.")
+        tqdm.write(f"Downloaded {ytid} successfully.")
