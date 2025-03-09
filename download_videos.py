@@ -1,6 +1,7 @@
 import os
 import json
 import subprocess
+from tqdm import tqdm
 
 # Ensure yt-dlp is installed: pip install yt-dlp
 
@@ -13,7 +14,7 @@ with open('data/mlb-youtube-segmented.json', 'r') as f:
     data = json.load(f)
 
 # Loop through video entries
-for video_id, entry in data.items():
+for video_id, entry in tqdm(data.items()):
     yturl = entry['url']
     ytid = yturl.split('=')[-1]
     start_time = entry['start']
